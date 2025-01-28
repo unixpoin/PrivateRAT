@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+  <%- include('partials/head.ejs'); %>
+
+  <body>
+    <div class="ui middle aligned center aligned grid">
+      <div class="column">
+        <form class="ui large form" method="POST">
+          <div class="ui raised segment">
+            <!-- Logo dan Header -->
+            <h2 class="ui center aligned header">
+              <img src="/logo.png" class="ui centered tiny image">
+              <div class="content">
+                Control Panel
+                <div class="sub header">Masuk ke dashboard</div>
+              </div>
+            </h2>
+
+            <!-- Form Fields -->
+            <div class="ui divider"></div>
+            <div class="field">
+              <div class="ui input">
+                <input 
+                  type="text" 
+                  name="username" 
+                  placeholder="Username"
+                  autocomplete="off"
+                  autofocus
+                >
+              </div>
+            </div>
+            <div class="field">
+              <div class="ui input">
+                <input 
+                  type="password" 
+                  name="password" 
+                  placeholder="Password"
+                >
+              </div>
+            </div>
+            <button type="submit" class="ui fluid large primary submit button">
+              Login
+            </button>
+
+            <!-- Error Message -->
+            <div class="ui error message"></div>
+          </div>
+        </form>
+
+        <%- include('partials/footer.ejs'); %>
+      </div>
+    </div>
+
+    <style>
+      body {
+        background: #1a1b1c;
+        min-height: 100vh;
+        margin: 0;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        color: #e0e0e0;
+      }
+
+      .grid {
+        height: 100vh;
+        margin: 0 !important;
+      }
+
+      .column {
+        max-width: 400px;
+        padding: 2em !important;
+      }
+
+      .ui.raised.segment {
+        background: #252729;
+        border: 1px solid #333;
+        box-shadow: 0 2px 25px rgba(0,0,0,.2) !important;
+      }
+
+      .ui.header {
+        color: #e0e0e0;
+      }
+
+      .ui.header .sub.header {
+        color: #888;
+      }
+
+      .ui.header img {
+        width: 80px !important;
+        margin-bottom: 1em;
+      }
+
+      .ui.form .field {
+        margin-bottom: 1.5em;
+      }
+
+      .ui.input {
+        width: 100%;
+      }
+
+      .ui.input > input {
+        background: #1d1e1f !important;
+        border: 1px solid #333 !important;
+        color: #e0e0e0 !important;
+        padding: 1em !important;
+        border-radius: 6px !important;
+        height: 3.2em;
+        line-height: 1.2;
+        transition: all 0.3s ease;
+      }
+
+      .ui.input input:focus {
+        background: #252729 !important;
+        border-color: #4299e1 !important;
+      }
+
+      .ui.submit.button {
+        background: #2c3e50;
+        color: #ecf0f1;
+        border: 1px solid #34495e;
+        padding: 1em;
+        margin-top: 1.5em;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        height: 3.2em;
+      }
+
+      .ui.submit.button:hover {
+        background: #34495e;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+
+      .ui.error.message {
+        background: #442326;
+        color: #e0e0e0;
+        border: 1px solid #662329;
+        box-shadow: none;
+      }
+
+      .ui.input input:hover {
+        background: #252729 !important;
+      }
+    </style>
+
+    <script>
+      $(document).ready(function() {
+        $('.ui.form').form({
+          fields: {
+            username: {
+              identifier: 'username',
+              rules: [{
+                type: 'empty',
+                prompt: 'Mohon masukkan username Anda'
+              }]
+            },
+            password: {
+              identifier: 'password',
+              rules: [{
+                type: 'empty',
+                prompt: 'Mohon masukkan password Anda'
+              }]
+            }
+          },
+          onSuccess: function() {
+            $('.submit.button').addClass('loading');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

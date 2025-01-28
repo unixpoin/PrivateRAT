@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+
+    <%- include('partials/head.ejs'); %>
+ 
+
+  <body>
+    <!-- <script>
+      gtag('event', 'screen_view', {
+          'screen_name': 'devices',
+          'app_name': 'Sanjaya'
+      });
+
+      gtag('event', 'devicecount', {
+          'devicesonline': <%= clientsOnline.length %>,
+          'devicesoffline': <%= clientsOffline.length %>,
+      }); -->
+    </script>
+    <div class="ui container">
+        <%- include('partials/header.ejs'); %>
+        
+        <!-- Dashboard Stats -->
+        <div class="ui three statistics">
+            <div class="statistic">
+                <div class="value">
+                    <i class="wifi icon"></i> <%= clientsOnline.length %>
+                </div>
+                <div class="label">Online Devices</div>
+            </div>
+            <div class="statistic">
+                <div class="value">
+                    <i class="power off icon"></i> <%= clientsOffline.length %>
+                </div>
+                <div class="label">Offline Devices</div>
+            </div>
+            <div class="statistic">
+                <div class="value">
+                    <i class="globe icon"></i> <%= clientsOnline.length + clientsOffline.length %>
+                </div>
+                <div class="label">Total Devices</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="ui segments">
+            <!-- Online Devices Panel -->
+            <div class="ui segment">
+                <h3 class="ui header">
+                    <i class="circle green icon pulse"></i>
+                    <div class="content">
+                        Connected Devices
+                        <div class="sub header">Active connections</div>
+                    </div>
+                </h3>
+                <table class="ui selectable celled table">
+                    <thead>
+                        <tr>
+                            <th class="three wide">Device ID</th>
+                            <th class="two wide">Location</th>
+                            <th class="three wide">Network</th>
+                            <th class="four wide">Device Info</th>
+                            <th class="two wide">Last Active</th>
+                            <th class="two wide">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% clientsOnline.forEach((item)=>{ %>
+                        <tr class="positive">
+                            <td>
+                                <div class="device-info">
+                                    <i class="mobile alternate icon"></i>
+                                    <div class="content">
+                                        <div class="device-id"><%= item.clientID %></div>
+                                        <div class="device-type">Android Device</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="center aligned">
+                                <i class="<%= item.dynamicData.clientGeo.country ? 
+                                    ('flag ' + item.dynamicData.clientGeo.country).toLowerCase() : 
+                                    'question circle' %> big icon"></i>
+                            </td>
+                            <td>
+                                <div class="network-info">
+                                    <i class="wifi icon"></i>
+                                    <%= item.dynamicData.clientIP %>
+                                </div>
+                            </td>
+                            <td><%= item.dynamicData.device.manufacture %> 
+                                <%= item.dynamicData.device.model ? `(${item.dynamicData.device.model})` : '' %>
+                            </td>
+                            <td class="time-cell">
+                                <%= new Date(item.lastSeen).toLocaleString('id-ID', { 
+                                    timeZone: 'Asia/Jakarta',
+                                    dateStyle: 'medium',
+                                    timeStyle: 'short'
+                                }) %>
+                            </td>
+                            <td class="center aligned">
+                                <a href="/manage/<%= item.clientID %>/info" 
+                                   class="ui small icon button primary">
+                                    <i class="terminal icon"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Offline Devices Panel -->
+            <div class="ui segment">
+                <h3 class="ui header">
+                    <i class="circle grey icon"></i>
+                    <div class="content">
+                        Disconnected Devices
+                        <div class="sub header">Inactive connections</div>
+                    </div>
+                </h3>
+                <table class="ui selectable celled table">
+                    <thead>
+                        <tr>
+                            <th class="three wide">Device ID</th>
+                            <th class="two wide">Location</th>
+                            <th class="three wide">Last Network</th>
+                            <th class="four wide">Device Info</th>
+                            <th class="two wide">Last Seen</th>
+                            <th class="two wide">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% clientsOffline.forEach((item)=>{ 
+                            let lsdate = new Date(item.lastSeen);
+                            let flagCss = (item.dynamicData.clientGeo.country !== undefined) ? 
+                                ('flag ' + item.dynamicData.clientGeo.country).toLowerCase() : 
+                                'icon question mark';
+                            let deviceStr = '';
+                            deviceStr += (item.dynamicData.device.manufacture !== undefined) ? 
+                                item.dynamicData.device.manufacture : '';
+                            deviceStr += (item.dynamicData.device.model !== undefined) ? 
+                                ' (' + item.dynamicData.device.model + ')' : ''; 
+                        %>
+                        <tr class="negative">
+                            <td>
+                                <h4 class="ui header">
+                                    <i class="mobile alternate icon"></i>
+                                    <div class="content">
+                                        <%= item.clientID %>
+                                        <div class="sub header">Android Device</div>
+                                    </div>
+                                </h4>
+                            </td>
+                            <td class="center aligned">
+                                <i class="<%= flagCss %> big icon"></i>
+                            </td>
+                            <td>
+                                <i class="wifi icon"></i> <%= item.dynamicData.clientIP %>
+                            </td>
+                            <td><%= deviceStr %></td>
+                            <td>
+                                <%= lsdate.toLocaleString('id-ID', { 
+                                    timeZone: 'Asia/Jakarta',
+                                    dateStyle: 'medium',
+                                    timeStyle: 'short'
+                                }) %>
+                            </td>
+                            <td class="center aligned">
+                                <a href="/manage/<%= item.clientID %>/info" 
+                                   class="ui small labeled icon basic button">
+                                    <i class="cog icon"></i>
+                                    Manage
+                                </a>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        body {
+            background: #1a1b1c;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        .ui.container {
+            padding: 2em;
+        }
+
+        /* Statistics Styling */
+        .ui.statistics {
+            margin: 2em 0;
+            display: flex;
+            justify-content: space-between;
+            gap: 1em;
+        }
+
+        .ui.statistic {
+            background: #252729;
+            padding: 1.5em;
+            border-radius: 10px;
+            border: 1px solid #333;
+            flex: 1;
+            margin: 0 !important;
+        }
+
+        .ui.statistic > .value,
+        .ui.statistic > .label {
+            color: #e0e0e0 !important;
+        }
+
+        .ui.statistic > .value {
+            text-shadow: 0 0 10px rgba(0,255,0,0.2);
+        }
+
+        /* Segments Styling */
+        .ui.segments {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .ui.segment {
+            background: #252729;
+            border: 1px solid #333;
+            border-radius: 10px;
+            margin-bottom: 2em;
+            padding: 2em;
+        }
+
+        /* Headers */
+        .ui.header {
+            color: #e0e0e0;
+        }
+
+        .ui.header .sub.header {
+            color: #888;
+        }
+
+        /* Table Styling */
+        .ui.table {
+            background: #1d1e1f;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #e0e0e0;
+        }
+
+        .ui.table thead th {
+            background: #2a2b2c;
+            color: #888;
+            border-bottom: 2px solid #333;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+        }
+
+        .ui.table td {
+            border-color: #333;
+        }
+
+        /* Row Styling */
+        .positive, .negative {
+            background: transparent !important;
+        }
+
+        tr.positive:hover {
+            background: rgba(0,255,0,0.03) !important;
+        }
+
+        tr.negative:hover {
+            background: rgba(255,0,0,0.03) !important;
+        }
+
+        /* Device Info Styling */
+        .device-info {
+            display: flex;
+            align-items: center;
+            gap: 1em;
+        }
+
+        .device-id {
+            font-weight: 600;
+            color: #4CAF50;
+        }
+
+        .device-type {
+            font-size: 0.85em;
+            color: #888;
+        }
+
+        /* Network Info */
+        .network-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        /* Button Styling */
+        .ui.button {
+            background: #2c3e50;
+            color: #ecf0f1;
+            border: 1px solid #34495e;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .ui.button:hover {
+            background: #34495e;
+            color: #fff;
+        }
+
+        /* Pulse Animation for Online Status */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Time Cell */
+        .time-cell {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #888;
+        }
+    </style>
+  </body>
+</html>
